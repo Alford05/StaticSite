@@ -1,8 +1,11 @@
 from enum import Enum
 import re
+import os
 from htmlnode import ParentNode
 from SplitNode import text_to_textnodes
 from textnode import text_node_to_html_node, TextNode, TextType
+from main import copy_static
+
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -147,6 +150,36 @@ def quote_to_html_node(block):
     content = " ".join(new_line)
     children = text_to_children(content)
     return ParentNode("blockquote", children)
+
+
+def extract_title(markdown):
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            line = line.rstrip()
+            return line.lstrip("# ")
+    raise ValueError("markdown has no header initializer")
+
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    with open(from_path, 'r', encoding='utf-8') as markdown_file:
+        markdown_content = markdown_file.read()
+    with open(template_path, 'r', encoding='utf-8') as template_file:
+        template_content = template_file.read()
+    html_node = markdown_to_html_node(markdown_content)
+    html_content = html_node.to_html()
+    title = extract_title(markdown_content)
+    final_html = template_content.replace("{{ Title }}", title)
+    final_html = final_html.replace("{{ Content }}", html_content)
+    dir_path = os.path.dirname(dest_path)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+    with open(dest_path, 'w', encoding='utf-8') as file:
+        file.write(final_html)
+
+
+
 
 
 
