@@ -4,7 +4,6 @@ import os
 from htmlnode import ParentNode
 from SplitNode import text_to_textnodes
 from textnode import text_node_to_html_node, TextNode, TextType
-from main import copy_static
 
 
 class BlockType(Enum):
@@ -75,7 +74,7 @@ def block_to_html_node(block):
         return quote_to_html_node(block)
     if block_type == BlockType.ULIST:
         return ulist_to_html_node(block)
-    if BlockType == BlockType.OLIST:
+    if block_type == BlockType.OLIST:
         return olist_to_html_node(block)
     raise ValueError("invalid block type")
     
@@ -161,22 +160,6 @@ def extract_title(markdown):
     raise ValueError("markdown has no header initializer")
 
 
-def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
-    with open(from_path, 'r', encoding='utf-8') as markdown_file:
-        markdown_content = markdown_file.read()
-    with open(template_path, 'r', encoding='utf-8') as template_file:
-        template_content = template_file.read()
-    html_node = markdown_to_html_node(markdown_content)
-    html_content = html_node.to_html()
-    title = extract_title(markdown_content)
-    final_html = template_content.replace("{{ Title }}", title)
-    final_html = final_html.replace("{{ Content }}", html_content)
-    dir_path = os.path.dirname(dest_path)
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path, exist_ok=True)
-    with open(dest_path, 'w', encoding='utf-8') as file:
-        file.write(final_html)
 
 
 
