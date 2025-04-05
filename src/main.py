@@ -24,6 +24,17 @@ def main():
         template_path,
         os.path.join(dir_path_public, "index.html"),
     )
+    for root, dirs, files in os.walk(dir_path_content):
+        for file in files:
+            if file == "index.md" and root == dir_path_content:
+                continue
+            if file.endswith(".md"):
+                content_path = os.path.join(root, file)
+                rel_path = os.path.relpath(content_path, dir_path_content)
+                public_path = os.path.join(dir_path_public, rel_path)
+                public_path = os.path.splitext(public_path)[0] + ".html"
+                generate_page(content_path, template_path, public_path)
+
 
 
 main()
